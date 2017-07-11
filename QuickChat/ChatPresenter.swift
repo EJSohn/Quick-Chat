@@ -7,6 +7,10 @@
 //
 
 import Foundation
+import CoreLocation
+import UIKit
+
+// UIKit only used for UIImage
 
 class ChatPresenter {
     
@@ -22,8 +26,8 @@ class ChatPresenter {
 
 extension ChatPresenter {
     
-    func downloadAllMessages(
-        forUserID userID: String) {
+    // Pull all messages
+    func downloadAllMessages(forUserID userID: String) {
         
         FirebaseDataManager.shared.getFirebaseConversation(forUserID: userID) { (receivedMessage, currentUserID) in
             guard let receivedMessage = receivedMessage else {
@@ -56,6 +60,73 @@ extension ChatPresenter {
             }
             
         }
+    }
+    
+    // Send messages 
+    func send(message: Message,
+              toID: String
+        ) {
+        var values: [String: Any] = [:]
+        
+        switch message.type {
+        case .location:
+            values = [
+                "type": "location",
+                "content": message.content,
+                "toID": toID,
+                "timestamp": message.timestamp,
+                "isRead": false
+            ]
+    
+        case .photo:
+            let imageData = UIImageJPEGRepresentation((message.content as! UIImage), 0.5)
+            let child = UUID().uuidString
+            
+            FirebaseDataManager.shared.getFirebaseImageMetadata(
+            imageData: imageData!,
+            child: child) { (metadata, error) in
+                if let _ = error {
+                    return
+                }
+                
+                let path = metadata?.downloadURL()?.absoluteString
+                values = [
+                    "type": "photo",
+                    "content": path!,
+                    "toID": toID,
+                    "timestamp": message.timestamp,
+                    "isRead": false
+                    ] as [String: Any]
+                
+            }
+        case .text:
+            values = [
+                "type": "text",
+                "content": message.content,
+                "toID": toID,
+                "timestamp": message.timestamp,
+                "isRead": false
+            ] as [String: Any]
+            
+        }
+        
+        FirebaseDataManager.shared.uploadMessage(
+            withValues: values,
+            toID: toID) { (status) in
+                print(status)
+        }
+    }
+    
+    func checkLocationPermission() -> Bool {
+        var state = false
+        switch CLLocationManager.authorizationStatus() {
+        case .authorizedWhenInUse:
+            state = true
+        case .authorizedAlways:
+            state = true
+        default: break
+        }
+        return state
     }
     
 }

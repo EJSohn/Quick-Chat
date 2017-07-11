@@ -24,7 +24,6 @@
 import UIKit
 import Photos
 import Firebase
-import CoreLocation
 
 protocol FetchMessages {
     func fetchMessages(messageModel viewModel: FetchedMessageViewModel)
@@ -56,6 +55,28 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     // Presenter
     var presenter: ChatPresenter!
+    
+    //MARK: LifeCycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.customization()
+        
+        presenter = ChatPresenter(view: self)
+        presenter.downloadAllMessages(forUserID: self.currentUser!.id)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.inputBar.backgroundColor = UIColor.clear
+        self.view.layoutIfNeeded()
+        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.showKeyboard(notification:)), name: Notification.Name.UIKeyboardWillShow, object: nil)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+        Message.markMessagesRead(forUserID: self.currentUser!.id)
+    }
 
     //MARK: Methods
     func customization() {
@@ -74,8 +95,6 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     // Fetch messages
     func fetchMessages(messageModel viewModel: FetchedMessageViewModel) {
-        print("invoked!")
-        
         items.append(viewModel.message)
         items.sort{ $0.timestamp < $1.timestamp }
         DispatchQueue.main.async {
@@ -86,29 +105,16 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
+    func composeMessage(type: MessageType, content: Any)  {
+        let message = Message.init(type: type, content: content, owner: .sender, timestamp: Int(Date().timeIntervalSince1970), isRead: false)
+        presenter.send(message: message, toID: (currentUser?.id)!)
+    }
+    
     //Hides current viewcontroller
     func dismissSelf() {
         if let navController = self.navigationController {
             navController.popViewController(animated: true)
         }
-    }
-    
-    func composeMessage(type: MessageType, content: Any)  {
-        let message = Message.init(type: type, content: content, owner: .sender, timestamp: Int(Date().timeIntervalSince1970), isRead: false)
-        Message.send(message: message, toID: self.currentUser!.id, completion: {(_) in
-        })
-    }
-    
-    func checkLocationPermission() -> Bool {
-        var state = false
-        switch CLLocationManager.authorizationStatus() {
-        case .authorizedWhenInUse:
-            state = true
-        case .authorizedAlways:
-            state = true
-        default: break
-        }
-        return state
     }
     
     func animateExtraButtons(toHide: Bool)  {
@@ -153,7 +159,7 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBAction func selectLocation(_ sender: Any) {
         self.canSendLocation = true
         self.animateExtraButtons(toHide: true)
-        if self.checkLocationPermission() {
+        if presenter.checkLocationPermission() {
             self.locationManager.startUpdatingLocation()
         } else {
             self.locationManager.requestWhenInUseAuthorization()
@@ -274,7 +280,7 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {          
         textField.resignFirstResponder()
         return true
     }
@@ -295,33 +301,10 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             if self.canSendLocation {
                 let coordinate = String(lastLocation.coordinate.latitude) + ":" + String(lastLocation.coordinate.longitude)
                 let message = Message.init(type: .location, content: coordinate, owner: .sender, timestamp: Int(Date().timeIntervalSince1970), isRead: false)
-                Message.send(message: message, toID: self.currentUser!.id, completion: {(_) in
-                })
+                presenter.send(message: message, toID: (currentUser?.id)!)
                 self.canSendLocation = false
             }
         }
-    }
-
-    //MARK: ViewController lifecycle
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        self.inputBar.backgroundColor = UIColor.clear
-        self.view.layoutIfNeeded()
-        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.showKeyboard(notification:)), name: Notification.Name.UIKeyboardWillShow, object: nil)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        NotificationCenter.default.removeObserver(self)
-        Message.markMessagesRead(forUserID: self.currentUser!.id)
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.customization()
-        
-        presenter = ChatPresenter(view: self)
-        presenter.downloadAllMessages(forUserID: self.currentUser!.id)
     }
 }
 
