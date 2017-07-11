@@ -26,6 +26,7 @@
 		453935B21F13A85800723745 /* ChatPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453935B11F13A85800723745 /* ChatPresenter.swift */; };
 		453935B41F13AAFC00723745 /* FetchedMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453935B31F13AAFC00723745 /* FetchedMessageViewModel.swift */; };
 		453935B61F13CA4300723745 /* FirebaseDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453935B51F13CA4300723745 /* FirebaseDataManager.swift */; };
+		453935B81F14929500723745 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453935B71F14929500723745 /* NetworkManager.swift */; };
 		62058F6006BD9ACBE0439C4B /* Pods_QuickChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8041C4B4A9DA4F0F53D2BDE /* Pods_QuickChat.framework */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +52,7 @@
 		453935B11F13A85800723745 /* ChatPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatPresenter.swift; sourceTree = "<group>"; };
 		453935B31F13AAFC00723745 /* FetchedMessageViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedMessageViewModel.swift; sourceTree = "<group>"; };
 		453935B51F13CA4300723745 /* FirebaseDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseDataManager.swift; sourceTree = "<group>"; };
+		453935B71F14929500723745 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		614F8B4888358059B3DC166B /* Pods-QuickChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickChat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-QuickChat/Pods-QuickChat.debug.xcconfig"; sourceTree = "<group>"; };
 		B8041C4B4A9DA4F0F53D2BDE /* Pods_QuickChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_QuickChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8FBFCFF82B6EB57B02FA375 /* Pods-QuickChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuickChat.release.xcconfig"; path = "Pods/Target Support Files/Pods-QuickChat/Pods-QuickChat.release.xcconfig"; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				453935B51F13CA4300723745 /* FirebaseDataManager.swift */,
+				453935B71F14929500723745 /* NetworkManager.swift */,
 			);
 			name = Manager;
 			sourceTree = "<group>";
@@ -327,6 +330,7 @@
 				220698841E066E4900F2284B /* Helper Files.swift in Sources */,
 				22873DAA1DC790550021690E /* Message.swift in Sources */,
 				22EA57911E1D32520008FFB2 /* VCCells.swift in Sources */,
+				453935B81F14929500723745 /* NetworkManager.swift in Sources */,
 				453935B61F13CA4300723745 /* FirebaseDataManager.swift in Sources */,
 				224834B11DB539A50019153C /* User.swift in Sources */,
 			);

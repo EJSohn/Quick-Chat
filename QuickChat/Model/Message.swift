@@ -37,6 +37,15 @@ class Message {
     private var toID: String?
     private var fromID: String?
     
+    //MARK: Inits
+    init(type: MessageType, content: Any, owner: MessageOwner, timestamp: Int, isRead: Bool) {
+        self.type = type
+        self.content = content
+        self.owner = owner
+        self.timestamp = timestamp
+        self.isRead = isRead
+    }
+    
     func downloadImage(indexpathRow: Int, completion: @escaping (Bool, Int) -> Swift.Void)  {
         if self.type == .photo {
             let imageLink = self.content as! String
@@ -160,12 +169,4 @@ class Message {
         }
     }
     
-    //MARK: Inits
-    init(type: MessageType, content: Any, owner: MessageOwner, timestamp: Int, isRead: Bool) {
-        self.type = type
-        self.content = content
-        self.owner = owner
-        self.timestamp = timestamp
-        self.isRead = isRead
-    }
 }
