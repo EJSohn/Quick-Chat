@@ -16,4 +16,7 @@
    <FileRef
       location = "group:README.md">
    </FileRef>
+   <FileRef
+      location = "group:/Users/amysohn/myProject/swift/Quick-Chat/GoogleService-Info.plist">
+   </FileRef>
 </Workspace>

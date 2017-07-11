@@ -26,7 +26,11 @@ import Photos
 import Firebase
 import CoreLocation
 
-class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate,  UINavigationControllerDelegate, UIImagePickerControllerDelegate, CLLocationManagerDelegate {
+protocol FetchMessages {
+    func fetchMessages(messageModel viewModel: FetchedMessageViewModel)
+}
+
+class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate,  UINavigationControllerDelegate, UIImagePickerControllerDelegate, CLLocationManagerDelegate, FetchMessages{
     
     //MARK: Properties
     @IBOutlet var inputBar: UIView!
@@ -50,6 +54,8 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     var currentUser: User?
     var canSendLocation = true
     
+    // Presenter
+    var presenter: ChatPresenter!
 
     //MARK: Methods
     func customization() {
@@ -66,19 +72,18 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         self.locationManager.delegate = self
     }
     
-    //Downloads messages
-    func fetchData() {
-        Message.downloadAllMessages(forUserID: self.currentUser!.id, completion: {[weak weakSelf = self] (message) in
-            weakSelf?.items.append(message)
-            weakSelf?.items.sort{ $0.timestamp < $1.timestamp }
-            DispatchQueue.main.async {
-                if let state = weakSelf?.items.isEmpty, state == false {
-                    weakSelf?.tableView.reloadData()
-                    weakSelf?.tableView.scrollToRow(at: IndexPath.init(row: self.items.count - 1, section: 0), at: .bottom, animated: false)
-                }
+    // Fetch messages
+    func fetchMessages(messageModel viewModel: FetchedMessageViewModel) {
+        print("invoked!")
+        
+        items.append(viewModel.message)
+        items.sort{ $0.timestamp < $1.timestamp }
+        DispatchQueue.main.async {
+            if !self.items.isEmpty {
+                self.tableView.reloadData()
+                self.tableView.scrollToRow(at: IndexPath.init(row: self.items.count-1, section: 0), at: .bottom, animated: false)
             }
-        })
-        Message.markMessagesRead(forUserID: self.currentUser!.id)
+        }
     }
     
     //Hides current viewcontroller
@@ -314,7 +319,9 @@ class ChatVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     override func viewDidLoad() {
         super.viewDidLoad()
         self.customization()
-        self.fetchData()
+        
+        presenter = ChatPresenter(view: self)
+        presenter.downloadAllMessages(forUserID: self.currentUser!.id)
     }
 }
 
